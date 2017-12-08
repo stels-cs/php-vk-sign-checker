@@ -1,0 +1,28 @@
+{
+  "name": "stels-cs/php-vk-sign-checker",
+  "description": "Check request signature for vk.com/dev/community_apps_docs",
+  "keywords": [
+    "vk",
+    "vk.com",
+    "community apps"
+  ],
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Иван Недзвецкий",
+      "email": "stels-cs@yandex.ru"
+    }
+  ],
+  "require": {
+    "php": ">=7.0.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "VkAppSign\\": "src/"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "4.1.*"
+  }
+}
