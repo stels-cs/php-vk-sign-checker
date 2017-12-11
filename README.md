@@ -4,7 +4,7 @@
 
 
 ```php
-composer require php-vk-sign-checker
+composer require stels-cs/php-vk-sign-checker
 ```
 
 ```php
