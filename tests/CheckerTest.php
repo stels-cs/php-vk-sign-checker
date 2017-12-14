@@ -14,6 +14,27 @@ class CheckerTest extends PHPUnit_Framework_TestCase
         }
     }
 
+    public function testCheckEmptySecretString() {
+        $ok = VkAppSign\Checker::checkString($this->request, "");
+        if ($ok) {
+            throw new \Exception("Valid result with invalid request");
+        }
+    }
+
+    public function testCheckEmptyRequestString() {
+        $ok = VkAppSign\Checker::checkString("", $this->appSecret);
+        if ($ok) {
+            throw new \Exception("Valid result with invalid request");
+        }
+    }
+
+    public function testCheckEmptyRequestAndSecretString() {
+        $ok = VkAppSign\Checker::checkString("", "");
+        if ($ok) {
+            throw new \Exception("Valid result with invalid request");
+        }
+    }
+
     public function testCheckParams() {
         $parmas = [
             'api_url'=>'https://api.vk.com/api.php',

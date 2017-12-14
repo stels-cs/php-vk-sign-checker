@@ -24,8 +24,8 @@ class Checker
             $sign .= ($param);
         }
 
-        $sig = $secret ? hash_hmac('sha256', $sign, $secret) : "";
-        $check = $params['sign'] ?? '';
+        $sig = $secret ? hash_hmac('sha256', $sign, $secret) : 'EMPTY SECRET'.uniqid();
+        $check = $params['sign'] ?? 'EMPTY SIGN'.uniqid();
         if ($sig === $check) {
             return true;
         }
