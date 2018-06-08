@@ -115,4 +115,16 @@ class CheckerTest extends PHPUnit_Framework_TestCase
             throw new \Exception("Invalid auth key passed");
         }
     }
+
+    public function testUnauthorizedUser() {
+        //Неавторизованные в вк пользователи
+        //Это особенная категория у них параметры
+        //sid, secret и api_settings равны false или null
+        //их не надо учитывать в подписи запроса
+        $r = '?user_id=0&api_url=https://api.vk.com/api.php&api_id=5990572&api_settings=false&viewer_id=0&viewer_type=0&access_token=6a31f467312d91e96a55b4a1336a6a9ccb66a316a31f467312ae06907293238948266bb&is_app_user=0&auth_key=c3dc47ba866e9ce0dd51ce97dbfd01bb&language=0&parent_language=0&is_secure=1&sid=null&secret=null&stats_hash=57ea812c7023558a6b&group_id=167021499&source=layer&lc_name=e48f5881&ads_app_id=5990572_f1da7822b63d66b589&sign=5426a723893c5507b62dec3a893979512249b6d078b055af04bdac921a2a93c2&hash=';
+        $ok = VkAppSign\Checker::checkString($r, 'y0xvZ38sBIrYIPWlup64');
+        if (!$ok) {
+            throw new \Exception("Invalid valid request");
+        }
+    }
 }

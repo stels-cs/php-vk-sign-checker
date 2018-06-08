@@ -21,7 +21,17 @@ class Checker
             if ($key == 'ad_info') {
                 $param = strtr($param, [' ' => '+']);
             }
-            $sign .= ($param);
+            //Сейчас тут будет убер костыль для случая когда к нам заходит незалогиненный пользоватлеь вк
+            //это все получено в результате опыта
+
+            if (($key === 'sid' || $key === 'secret') && $param === 'null') {
+                continue;
+            }
+
+            if ($key === 'api_settings' && $param === 'false') {
+                continue;
+            }
+            $sign .= (string)($param);
         }
 
         $sig = $secret ? hash_hmac('sha256', $sign, $secret) : 'EMPTY SECRET'.uniqid();
