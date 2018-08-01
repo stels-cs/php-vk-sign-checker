@@ -17,3 +17,30 @@ if ($ok) {
 //ОИШИБКА, запрос был изменен или неверный $appSecret
 }
 ```
+
+
+Рассчет подписи для платежей VkPay
+
+```php
+
+$data = [
+    'order_id' => 555,
+    'ts' => time(),
+];
+
+$amount = 100;
+
+$merchantId = 5556677; //Fake
+$secret = 'DervCzxvwetgtvDFSGesrtbsrtbsvesr'; //Fake
+$description = "TestPay";
+$params = \VkAppSign\Checker::vkPayToService($merchantId, $amount, $description, $data, $secret);
+
+$params //надо передать в openExternalApp на стороне клиента
+
+//Дебаг
+$ss = json_encode($params, JSON_UNESCAPED_UNICODE);
+$tmp = "VK.callMethod(\"openExternalApp\", \"vkpay\", {$ss})";
+echo $tmp; //
+```
+
+

@@ -21,7 +21,7 @@ class Checker
             if ($key == 'ad_info') {
                 $param = strtr($param, [' ' => '+']);
             }
-            //Сейчас тут будет убер костыль для случая когда к нам заходит незалогиненный пользоватлеь вк
+            //Костыль для случая когда к нам заходит незалогиненный пользоватлеь вк
             //это все получено в результате опыта
 
             if (($key === 'sid' || $key === 'secret') && $param === 'null') {
@@ -44,5 +44,54 @@ class Checker
 
     public static function checkAuthKey(string $key, int $viewerId, int $appId, string $secret) {
         return $key === md5( implode('_', [$appId, $viewerId, $secret]) );
+    }
+
+    /**
+     * Рассчет подписи для данных в вызовах метода вкпей
+     * $data = [
+     *  'order_id' => 555,
+     *  'ts' => time()
+     * ]
+     * @param int $merchantId
+     * @param float $amount
+     * @param string $description
+     * @param array $data
+     * @param string $vk_app_secret
+     * @return array
+     */
+    public static function vkPayToService(
+        int $merchantId,
+        float $amount,
+        string $description,
+        array $data,
+        string $vk_app_secret) {
+
+        //Тут ключи отсортированы по алфавиту
+        //это важно очень сильно
+        $params = [
+            "action" => "pay-to-service",
+            "amount" => $amount,
+            "data" => json_encode($data),
+            "description" => $description,
+            "merchant_id" => $merchantId,
+        ];
+
+        $sign = '';
+        foreach ($params as $key => $value) {
+            if ($key != 'action') {
+                $sign .= ($key.'='.$value);
+            }
+        }
+        $sign .= $vk_app_secret;
+        $params['sign'] = md5($sign);
+        return $params;
+    }
+
+    public static function signMerchantData(array $data, string $merchant_private_key) {
+        $x = [];
+        $encodedMerchantData = base64_encode(json_encode($data));
+        $x['merchant_data'] = $encodedMerchantData;
+        $x['merchant_sign'] = sha1($encodedMerchantData . $merchant_private_key);
+        return $x;
     }
 }
