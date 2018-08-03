@@ -28,6 +28,12 @@ class Checker
                 continue;
             }
 
+            // Иногда и такое бывает
+            // access_token обычно это ключ доступа, но если это false то его не надо конкатинировать к строке
+            if (($key === 'access_token') && $param === 'false') {
+                continue;
+            }
+
             if ($key === 'api_settings' && $param === 'false') {
                 continue;
             }
