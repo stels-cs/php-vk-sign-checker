@@ -43,4 +43,76 @@ $tmp = "VK.callMethod(\"openExternalApp\", \"vkpay\", {$ss})";
 echo $tmp; //
 ```
 
+Пример Request для Laravel
 
+```php
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+use VkAppSign\Checker;
+
+class SignRequest extends FormRequest
+{
+    public $groupId;
+    public $viewerType;
+    public $userId;
+    public $hash;
+
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize()
+    {
+        $url = $this->header('X-vk-sign', $this->header('x-vk-sign', ''));
+        $launchParameters = $this->parseLaunchParametersUrl($url);
+        $areParametersValid = Checker::checkParams($launchParameters, config('app.vk_app_secret'));
+        if (!$areParametersValid) {
+            return false;
+        }
+        $this->groupId = !empty($launchParameters['group_id']) ? (int)$launchParameters['group_id'] : null;
+        $this->viewerType = (int)$launchParameters['viewer_type'];
+        $this->userId = (int)$launchParameters['viewer_id'];
+        $this->hash = (string)$launchParameters['hash'];
+        return true;
+    }
+
+    public function parseLaunchParametersUrl($url)
+    {
+        $query = preg_replace('/^\?/usi', '', $url);
+        $params = [];
+        parse_str($query, $params);
+        return $params;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        return [
+            //
+        ];
+    }
+
+    public function int($key, $def = 0): int
+    {
+        return (int)$this->get($key, $def);
+    }
+
+    public function string($key, $def = '')
+    {
+        return trim((string)$this->get($key, $def));
+    }
+
+    public function getArray($key, $def = [])
+    {
+        return (array)$this->get($key, $def);
+    }
+}
+```
