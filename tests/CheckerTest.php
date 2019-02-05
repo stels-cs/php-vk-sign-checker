@@ -127,4 +127,11 @@ class CheckerTest extends PHPUnit_Framework_TestCase
             throw new \Exception("Invalid valid request");
         }
     }
+
+    public function testVkAppsSign() {
+        $secret = "rkwdOT04kUh28RDEC9zr";
+        $request = "?vk_access_token_settings=friends%2Cgroups&vk_app_id=6825462&vk_are_notifications_enabled=0&vk_is_app_user=1&vk_language=ru&vk_platform=desktop_web&vk_user_id=19039187&sign=vBBPIysvzccFUn_e55JCGxZBnmxpXeh92XpiAY9gcv8";
+
+        $this->assertTrue(VkAppSign\Checker::checkVkAppsSign($request, $secret));
+    }
 }

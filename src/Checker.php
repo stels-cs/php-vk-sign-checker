@@ -6,6 +6,31 @@ namespace VkAppSign;
 
 class Checker
 {
+    public static function checkVkAppsSign(string $path, string $secret) : bool {
+        $query = preg_replace('/^\?/usi', '', $path);
+        $params = [];
+        parse_str($query, $params);
+        return self::checkVkAppsParams($params, $secret);
+    }
+
+    public static function checkVkAppsParams(array $params, string $secret) : bool {
+        $signParams = [];
+        foreach ($params as $key => $param) {
+            if (strpos($key, 'vk_') !== 0) {
+                continue;
+            }
+            $signParams[$key] = $param;
+        }
+        ksort($signParams);
+        $signParamsQuery = http_build_query($signParams);
+        $sign = rtrim(strtr(base64_encode(hash_hmac('sha256', $signParamsQuery, $secret, true)), '+/', '-_'), '=');
+        $signFromParams = !empty($params['sign']) ? $params['sign'] : false;
+        if (empty($signFromParams) || empty($secret)) {
+            return false;
+        }
+        return $sign === $signFromParams;
+    }
+
     public static function checkString(string $path, string $secret) : bool {
         $query = preg_replace('/^\?/usi', '', $path);
         $params = [];
