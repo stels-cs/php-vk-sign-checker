@@ -112,9 +112,7 @@ class SignRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public function int($key, $def = 0): int
