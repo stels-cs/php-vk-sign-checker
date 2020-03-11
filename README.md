@@ -75,7 +75,16 @@ class SignRequest extends FormRequest
     public $groupId;
     public $viewerType;
     public $userId;
+    public $appId;
     public $hash;
+    public $isAppUser = false;
+    public $areNotificationsEnabled = false;
+    public $accessTokenSettings = '';
+    public $language = '';
+    public $viewerGroupRole = '';
+    public $platform = '';
+    public $sign = '';
+
 
     /**
      * Determine if the user is authorized to make this request.
@@ -86,14 +95,59 @@ class SignRequest extends FormRequest
     {
         $url = $this->header('X-vk-sign', $this->header('x-vk-sign', ''));
         $launchParameters = $this->parseLaunchParametersUrl($url);
-        $areParametersValid = Checker::checkParams($launchParameters, config('app.vk_app_secret'));
+
+        $secret = config('app.vk_app_secret');
+
+
+        $areParametersValid = Checker::checkVkAppsParams($launchParameters, $secret);
         if (!$areParametersValid) {
             return false;
         }
-        $this->groupId = !empty($launchParameters['group_id']) ? (int)$launchParameters['group_id'] : null;
-        $this->viewerType = (int)$launchParameters['viewer_type'];
-        $this->userId = (int)$launchParameters['viewer_id'];
-        $this->hash = (string)$launchParameters['hash'];
+
+
+        $this->viewerType = 0;
+        $this->hash = (string)($launchParameters['hash'] ?? '');
+
+        if (isset($launchParameters['vk_user_id'])) {
+            $this->userId = (int)$launchParameters['vk_user_id'];
+        }
+
+        if (isset($launchParameters['vk_app_id'])) {
+            $this->appId = (int)$launchParameters['vk_app_id'];
+        }
+        if (isset($launchParameters['vk_is_app_user'])) {
+            if ((int)$launchParameters['vk_is_app_user'] === 1) {
+                $this->isAppUser = true;
+            } else {
+                $this->isAppUser = false;
+            }
+        }
+        if (isset($launchParameters['vk_are_notifications_enabled'])) {
+            if ((int)$launchParameters['vk_are_notifications_enabled'] === 1) {
+                $this->areNotificationsEnabled = true;
+            } else {
+                $this->areNotificationsEnabled = false;
+            }
+        }
+        if (isset($launchParameters['vk_language'])) {
+            $this->language = (string)$launchParameters['vk_language'];
+        }
+        if (isset($launchParameters['vk_access_token_settings'])) {
+            $this->accessTokenSettings = (string)$launchParameters['vk_access_token_settings'];
+        }
+        if (isset($launchParameters['vk_group_id'])) {
+            $this->groupId = (int)$launchParameters['vk_group_id'];
+        }
+        if (isset($launchParameters['vk_viewer_group_role'])) {
+            $this->viewerGroupRole = (string)$launchParameters['vk_viewer_group_role'];
+        }
+        if (isset($launchParameters['vk_platform'])) {
+            $this->platform = (string)$launchParameters['vk_platform'];
+        }
+        if (isset($launchParameters['sign'])) {
+            $this->sign = (string)$launchParameters['sign'];
+        }
+
         return true;
     }
 
@@ -112,7 +166,9 @@ class SignRequest extends FormRequest
      */
     public function rules()
     {
-        return [];
+        return [
+            //
+        ];
     }
 
     public function int($key, $def = 0): int
@@ -125,9 +181,10 @@ class SignRequest extends FormRequest
         return trim((string)$this->get($key, $def));
     }
 
-    public function getArray($key, $def = [])
+    public function str($key, $def, $max)
     {
-        return (array)$this->get($key, $def);
+        $str = $this->string($key, $def);
+        return mb_substr($str, 0, $max);
     }
 }
 ```
